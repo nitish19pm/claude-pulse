@@ -5,7 +5,7 @@
 A web dashboard that aggregates AI + product management articles from multiple sources in real time.
 
 ## Live URL
-https://claude-pulse-six.vercel.app
+https://radar-ai-six.vercel.app
 
 ## Tech Stack
 - **Backend**: Node.js + Express (`server.js`)
