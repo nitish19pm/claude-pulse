@@ -10,10 +10,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── RSS newsletters ───────────────────────────────────────────────────────
 const RSS_FEEDS = [
-  { url: 'https://tldr.tech/api/rss/ai',              name: 'TLDR AI' },
-  { url: 'https://bensbites.beehiiv.com/feed',         name: "Ben's Bites" },
-  { url: 'https://www.therundown.ai/rss',              name: 'The Rundown AI' },
-  { url: 'https://importai.substack.com/feed',         name: 'Import AI' },
+  // AI newsletters
+  { url: 'https://tldr.tech/api/rss/ai',                    name: 'TLDR AI' },
+  { url: 'https://bensbites.beehiiv.com/feed',               name: "Ben's Bites" },
+  { url: 'https://www.therundown.ai/rss',                    name: 'The Rundown AI' },
+  { url: 'https://importai.substack.com/feed',               name: 'Import AI' },
+  // PM newsletters
+  { url: 'https://www.lennysnewsletter.com/feed',            name: "Lenny's Newsletter" },
+  { url: 'https://www.producttalk.org/feed/',                name: 'Product Talk' },
+  { url: 'https://www.mindtheproduct.com/feed/',             name: 'Mind the Product' },
+  { url: 'https://cutlefish.substack.com/feed',              name: 'The Beautiful Mess' },
 ];
 
 async function fetchRssFeed({ url, name }) {

@@ -179,10 +179,13 @@
   // ── PM + AI keyword filter ────────────────────────────────────────────────
 
   const AI_KEYWORDS = ['claude', 'anthropic', 'chatgpt', 'openai', 'gpt-4', 'gpt-4o', 'gpt4', 'gemini', 'copilot', 'llm', 'ai tool', 'large language model', 'generative ai', 'gen ai', 'agent', 'agentic', 'gpt', ' ai '];
+  const PM_TAG_KEYWORDS = ['product management', 'product manager', 'roadmap', 'saas', 'enterprise', 'workflow', 'productivity', 'product strategy', 'product owner'];
 
   function getMatchedTags(title) {
     const t = title.toLowerCase();
-    return AI_KEYWORDS.filter(k => t.includes(k)).slice(0, 4);
+    const aiTags = AI_KEYWORDS.filter(k => t.includes(k));
+    const pmTags = PM_TAG_KEYWORDS.filter(k => t.includes(k));
+    return [...new Set([...aiTags, ...pmTags])].slice(0, 5);
   }
 
   // ── Client-side fetchers (CORS-friendly APIs) ─────────────────────────────
