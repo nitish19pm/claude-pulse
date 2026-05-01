@@ -102,13 +102,13 @@
   // ── Client-side fetchers (CORS-friendly APIs) ─────────────────────────────
 
   async function fetchHackerNews() {
-    const queries = ['claude anthropic', 'claude AI'];
+    const queries = ['anthropic', 'claude AI'];
     const seenIds = new Set();
     const posts = [];
 
     for (const q of queries) {
       const r = await fetch(
-        `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(q)}&sort=byDate&hitsPerPage=30`
+        `https://hn.algolia.com/api/v1/search_by_date?query=${encodeURIComponent(q)}&hitsPerPage=30`
       );
       const data = await r.json();
       for (const hit of data.hits ?? []) {
