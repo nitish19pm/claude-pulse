@@ -105,7 +105,7 @@
 
   // ── PM + AI keyword filter ────────────────────────────────────────────────
 
-  const AI_KEYWORDS = ['claude', 'anthropic', 'chatgpt', 'openai', 'gpt-4', 'gpt4', 'gemini', 'copilot', 'llm', 'ai tool', 'large language model'];
+  const AI_KEYWORDS = ['claude', 'anthropic', 'chatgpt', 'openai', 'gpt-4', 'gpt-4o', 'gpt4', 'gemini', 'copilot', 'llm', 'ai tool', 'large language model', 'generative ai', 'gen ai', 'agent', 'agentic', 'gpt', ' ai '];
 
   function getMatchedTags(title) {
     const t = title.toLowerCase();
@@ -148,11 +148,16 @@
 
   async function fetchDevTo() {
     const tags = ['claude', 'chatgpt', 'openai', 'gemini', 'copilot', 'productmanagement'];
-    const results = await Promise.allSettled(
-      tags.map(tag =>
-        fetch(`https://dev.to/api/articles?tag=${tag}&per_page=30`).then(r => r.json())
-      )
-    );
+    let results;
+    try {
+      results = await Promise.allSettled(
+        tags.map(tag =>
+          fetch(`https://dev.to/api/articles?tag=${tag}&per_page=30`).then(r => r.json())
+        )
+      );
+    } catch (err) {
+      return { posts: [], fetchedAt: Date.now() };
+    }
 
     const seenIds = new Set();
     const posts = [];
