@@ -16,8 +16,9 @@
     'Topics':   ['product management', 'roadmap', 'saas', 'enterprise', 'workflow', 'productivity'],
   };
 
-  let activeChips = new Set(JSON.parse(localStorage.getItem('radarai_chips') || '[]'));
-  let filterOpen  = JSON.parse(localStorage.getItem('radarai_filter_open') || 'false');
+  let activeChips  = new Set(JSON.parse(localStorage.getItem('radarai_chips') || '[]'));
+  let filterOpen   = JSON.parse(localStorage.getItem('radarai_filter_open') || 'false');
+  let activeDays   = parseInt(localStorage.getItem('radarai_days') || '0', 10);
 
   function saveChips() {
     localStorage.setItem('radarai_chips', JSON.stringify([...activeChips]));
@@ -39,7 +40,21 @@
     document.querySelectorAll('.chip').forEach(btn => {
       btn.classList.toggle('active', activeChips.has(btn.dataset.chip));
     });
+
+    document.querySelectorAll('.time-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.days) === activeDays);
+    });
   }
+
+  // ── Time filter ───────────────────────────────────────────────────────────
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.time-btn');
+    if (!btn) return;
+    activeDays = parseInt(btn.dataset.days);
+    localStorage.setItem('radarai_days', activeDays);
+    updateChipUI();
+    renderPosts();
+  });
 
   function renderChips() {
     const groupEls = { 'AI Tools': document.getElementById('chip-group-ai'), 'Topics': document.getElementById('chip-group-topics') };
@@ -160,6 +175,11 @@
     let filtered = activeFilter === 'all'
       ? allPosts
       : allPosts.filter((p) => p.source === activeFilter);
+
+    if (activeDays > 0) {
+      const cutoff = Date.now() - activeDays * 86400000;
+      filtered = filtered.filter(p => p.createdAt && p.createdAt >= cutoff);
+    }
 
     if (activeChips.size > 0) {
       filtered = filtered.filter(p =>
@@ -287,11 +307,17 @@
     for (const { result, label } of labeled) {
       if (result.status === 'fulfilled') {
         const data = result.value;
-        if (data.disabled) continue; // silently skip disabled sources
+        if (data.disabled) continue;
         if (data.error) {
           errors.push(`${label}: ${data.error}`);
         } else {
-          posts.push(...(data.posts ?? []));
+          // Enrich tags for all posts after fetch
+          const enriched = (data.posts ?? []).map(p => {
+            const baseTags = (p.tags && p.tags.length > 0) ? p.tags : getMatchedTags(p.title);
+            const newsletterTag = p.newsletter ? [p.newsletter.toLowerCase()] : [];
+            return { ...p, tags: [...new Set([...baseTags, ...newsletterTag])].slice(0, 5) };
+          });
+          posts.push(...enriched);
           if (data.fetchedAt) latestFetchedAt = Math.max(latestFetchedAt ?? 0, data.fetchedAt);
         }
       } else {

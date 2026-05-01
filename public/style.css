@@ -141,12 +141,17 @@ header {
   to { transform: rotate(360deg); }
 }
 
+.logo-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .tagline {
-  text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   font-style: italic;
-  margin-top: 2px;
+  padding-left: 2px;
 }
 
 .last-fetched {
@@ -448,6 +453,41 @@ main {
 }
 
 .chip.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.time-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px 10px;
+  flex-wrap: wrap;
+}
+
+.time-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.time-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.time-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.time-btn.active {
   background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--text);

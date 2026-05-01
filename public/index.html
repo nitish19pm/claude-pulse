@@ -9,9 +9,12 @@
 <body>
   <header>
     <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">📡</span>
-        <span class="logo-text">Radar<strong>AI</strong></span>
+      <div class="logo-wrap">
+        <div class="logo">
+          <span class="logo-icon">📡</span>
+          <span class="logo-text">Radar<strong>AI</strong></span>
+        </div>
+        <div class="tagline">Everything AI. Nothing you don't need.</div>
       </div>
       <div class="controls">
         <div class="filter-group">
@@ -27,7 +30,6 @@
         </button>
       </div>
     </div>
-    <div class="tagline">Everything AI. Nothing you don't need.</div>
     <div class="last-fetched" id="last-fetched">Never fetched</div>
   </header>
 
@@ -41,6 +43,17 @@
       <div class="chip-groups-wrap">
         <div class="chip-group" id="chip-group-ai"></div>
         <div class="chip-group" id="chip-group-topics"></div>
+      </div>
+      <div class="time-filter-wrap">
+        <span class="chip-label">Time Range</span>
+        <div class="time-btns">
+          <button class="time-btn" data-days="1">1D</button>
+          <button class="time-btn" data-days="2">2D</button>
+          <button class="time-btn" data-days="7">1W</button>
+          <button class="time-btn" data-days="14">2W</button>
+          <button class="time-btn" data-days="30">1M</button>
+          <button class="time-btn active" data-days="0">All</button>
+        </div>
       </div>
       <button id="chip-clear" class="chip-clear-btn hidden">✕ Clear filters</button>
     </div>
