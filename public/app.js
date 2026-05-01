@@ -166,18 +166,14 @@
     const errors = [];
     let latestFetchedAt = null;
 
-    const [hnResult, devtoResult, phResult, redditResult] = await Promise.allSettled([
+    const [hnResult, devtoResult] = await Promise.allSettled([
       fetchHackerNews(),
       fetchDevTo(),
-      fetch('/api/producthunt').then((r) => r.json()),
-      fetch('/api/reddit').then((r) => r.json()),
     ]);
 
     const labeled = [
-      { result: hnResult,     label: 'Hacker News' },
-      { result: devtoResult,  label: 'Dev.to' },
-      { result: phResult,     label: 'Product Hunt' },
-      { result: redditResult, label: 'Reddit' },
+      { result: hnResult,    label: 'Hacker News' },
+      { result: devtoResult, label: 'Dev.to' },
     ];
 
     const posts = [];
