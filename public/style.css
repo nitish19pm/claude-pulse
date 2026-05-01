@@ -345,6 +345,113 @@ main {
   font-size: 1rem;
 }
 
+/* ── Chip filter ── */
+#chip-filter {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.chip-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 10px 24px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.chip-toggle:hover { color: var(--text); }
+
+.chip-arrow {
+  margin-left: auto;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.chip-active-count {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  font-size: 0.7rem;
+  padding: 1px 8px;
+  font-weight: 600;
+}
+
+.chip-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.chip-body.open {
+  max-height: 300px;
+}
+
+.chip-groups-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 24px 8px;
+}
+
+.chip-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.chip {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.chip.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.chip-clear-btn {
+  display: block;
+  margin: 4px 24px 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.chip-clear-btn:hover { color: var(--reddit); }
+
 /* ── WIP button ── */
 .filter-btn.wip {
   opacity: 0.45;

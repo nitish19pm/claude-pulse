@@ -9,6 +9,71 @@
   let allPosts = [];
   let activeFilter = 'all';
 
+  // ── Chip filter state ─────────────────────────────────────────────────────
+
+  const CHIP_GROUPS = {
+    'AI Tools': ['claude', 'anthropic', 'chatgpt', 'openai', 'gemini', 'copilot', 'gpt', 'llm', 'agent'],
+    'Topics':   ['product management', 'roadmap', 'saas', 'enterprise', 'workflow', 'productivity'],
+  };
+
+  let activeChips = new Set(JSON.parse(localStorage.getItem('claude_pulse_chips') || '[]'));
+  let filterOpen  = JSON.parse(localStorage.getItem('claude_pulse_filter_open') || 'false');
+
+  function saveChips() {
+    localStorage.setItem('claude_pulse_chips', JSON.stringify([...activeChips]));
+  }
+
+  function updateChipUI() {
+    const count = activeChips.size;
+    const countEl = document.getElementById('chip-active-count');
+    const clearBtn = document.getElementById('chip-clear');
+    const arrow = document.getElementById('chip-arrow');
+    const body = document.getElementById('chip-body');
+
+    countEl.textContent = `${count} active`;
+    countEl.classList.toggle('hidden', count === 0);
+    clearBtn.classList.toggle('hidden', count === 0);
+    arrow.style.transform = filterOpen ? 'rotate(180deg)' : '';
+    body.classList.toggle('open', filterOpen);
+
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.classList.toggle('active', activeChips.has(btn.dataset.chip));
+    });
+  }
+
+  function renderChips() {
+    const groupEls = { 'AI Tools': document.getElementById('chip-group-ai'), 'Topics': document.getElementById('chip-group-topics') };
+    for (const [groupName, chips] of Object.entries(CHIP_GROUPS)) {
+      const el = groupEls[groupName];
+      if (!el) continue;
+      el.innerHTML = `<span class="chip-label">${groupName}</span>` +
+        chips.map(c => `<button class="chip${activeChips.has(c) ? ' active' : ''}" data-chip="${c}">${c}</button>`).join('');
+    }
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chip = btn.dataset.chip;
+        if (activeChips.has(chip)) activeChips.delete(chip);
+        else activeChips.add(chip);
+        saveChips();
+        updateChipUI();
+        renderPosts();
+      });
+    });
+  }
+
+  document.getElementById('chip-toggle').addEventListener('click', () => {
+    filterOpen = !filterOpen;
+    localStorage.setItem('claude_pulse_filter_open', JSON.stringify(filterOpen));
+    updateChipUI();
+  });
+
+  document.getElementById('chip-clear').addEventListener('click', () => {
+    activeChips.clear();
+    saveChips();
+    updateChipUI();
+    renderPosts();
+  });
+
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   function timeAgo(ts) {
@@ -90,9 +155,15 @@
   }
 
   function renderPosts() {
-    const filtered = activeFilter === 'all'
+    let filtered = activeFilter === 'all'
       ? allPosts
       : allPosts.filter((p) => p.source === activeFilter);
+
+    if (activeChips.size > 0) {
+      filtered = filtered.filter(p =>
+        (p.tags || []).some(t => activeChips.has(t.toLowerCase()))
+      );
+    }
 
     if (filtered.length === 0) {
       grid.innerHTML = '';
@@ -272,5 +343,7 @@
   });
 
   refreshBtn.addEventListener('click', fetchAll);
+  renderChips();
+  updateChipUI();
   fetchAll();
 })();

@@ -29,6 +29,21 @@
     <div class="last-fetched" id="last-fetched">Never fetched</div>
   </header>
 
+  <section id="chip-filter">
+    <button id="chip-toggle" class="chip-toggle">
+      <span>🎛 Filters</span>
+      <span id="chip-active-count" class="chip-active-count hidden"></span>
+      <span id="chip-arrow" class="chip-arrow">▾</span>
+    </button>
+    <div id="chip-body" class="chip-body">
+      <div class="chip-groups-wrap">
+        <div class="chip-group" id="chip-group-ai"></div>
+        <div class="chip-group" id="chip-group-topics"></div>
+      </div>
+      <button id="chip-clear" class="chip-clear-btn hidden">✕ Clear filters</button>
+    </div>
+  </section>
+
   <main>
     <div id="status-bar" class="status-bar hidden"></div>
     <div id="cards-grid" class="cards-grid"></div>
