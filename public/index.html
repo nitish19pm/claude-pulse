@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Pulse</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">Claude <strong>Pulse</strong></span>
+      </div>
+      <div class="controls">
+        <div class="filter-group">
+          <button class="filter-btn active" data-source="all">All</button>
+          <button class="filter-btn" data-source="reddit">Reddit</button>
+          <button class="filter-btn" data-source="producthunt">Product Hunt</button>
+        </div>
+        <button id="refresh-btn" class="refresh-btn">
+          <span class="refresh-icon">↻</span> Refresh
+        </button>
+      </div>
+    </div>
+    <div class="last-fetched" id="last-fetched">Never fetched</div>
+  </header>
+
+  <main>
+    <div id="status-bar" class="status-bar hidden"></div>
+    <div id="cards-grid" class="cards-grid"></div>
+    <div id="empty-state" class="empty-state hidden">
+      <p>No posts found. Try refreshing.</p>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
