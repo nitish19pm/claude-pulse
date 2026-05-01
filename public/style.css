@@ -17,6 +17,10 @@
   --reddit-bg: #2a1208;
   --ph: #da552f;
   --ph-bg: #291510;
+  --hn: #ff6600;
+  --hn-bg: #2a1800;
+  --devto: #a855f7;
+  --devto-bg: #1e0f33;
   --upvote: #f0c040;
   --radius: 12px;
   --shadow: 0 2px 16px rgba(0,0,0,0.45);
@@ -210,6 +214,18 @@ main {
   text-transform: uppercase;
   padding: 3px 9px;
   border-radius: 6px;
+}
+
+.badge-hn {
+  background: var(--hn-bg);
+  color: var(--hn);
+  border: 1px solid #5a3000;
+}
+
+.badge-devto {
+  background: var(--devto-bg);
+  color: var(--devto);
+  border: 1px solid #3d1a66;
 }
 
 .badge-reddit {

@@ -9,7 +9,7 @@
   let allPosts = [];
   let activeFilter = 'all';
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
   function timeAgo(ts) {
     if (!ts) return 'unknown time';
@@ -18,10 +18,6 @@
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return `${Math.floor(diff / 86400)}d ago`;
-  }
-
-  function formatFetchTime(ts) {
-    return `Last fetched: ${new Date(ts).toLocaleTimeString()}`;
   }
 
   function showStatus(msg, isError = false) {
@@ -34,9 +30,17 @@
     statusBar.classList.add('hidden');
   }
 
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   // ── Skeletons ─────────────────────────────────────────────────────────────
 
-  function renderSkeletons(count = 8) {
+  function renderSkeletons(count = 9) {
     grid.innerHTML = Array.from({ length: count }, () => `
       <div class="skeleton">
         <div class="skel-line" style="width:30%;height:14px"></div>
@@ -47,13 +51,18 @@
     `).join('');
   }
 
-  // ── Card rendering ────────────────────────────────────────────────────────
+  // ── Card ─────────────────────────────────────────────────────────────────
+
+  const SOURCES = {
+    hackernews:  { label: 'Hacker News', cls: 'badge-hn' },
+    devto:       { label: 'Dev.to',      cls: 'badge-devto' },
+    producthunt: { label: 'Product Hunt',cls: 'badge-ph' },
+    reddit:      { label: 'Reddit',      cls: 'badge-reddit' },
+  };
 
   function buildCard(post) {
-    const isReddit = post.source === 'reddit';
-    const badgeClass = isReddit ? 'badge-reddit' : 'badge-ph';
-    const badgeLabel = isReddit ? 'Reddit' : 'Product Hunt';
-    const subLabel = isReddit && post.subreddit ? `<span class="card-sub">${post.subreddit}</span>` : '';
+    const src = SOURCES[post.source] ?? { label: post.source, cls: '' };
+    const subLabel = post.subreddit ? `<span class="card-sub">${post.subreddit}</span>` : '';
     const upvoteStr = post.upvotes > 0 ? `<span class="upvotes">▲ ${post.upvotes.toLocaleString()}</span>` : '<span></span>';
     const timestamp = post.createdAt ? `<span class="timestamp">${timeAgo(post.createdAt)}</span>` : '<span></span>';
     const permalink = post.permalink || post.url;
@@ -61,7 +70,7 @@
     return `
       <article class="card" data-source="${post.source}">
         <div class="card-meta">
-          <span class="badge ${badgeClass}">${badgeLabel}</span>
+          <span class="badge ${src.cls}">${src.label}</span>
           ${subLabel}
         </div>
         <div class="card-title">
@@ -76,17 +85,10 @@
     `;
   }
 
-  function escapeHtml(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
   function renderPosts() {
-    const filtered =
-      activeFilter === 'all' ? allPosts : allPosts.filter((p) => p.source === activeFilter);
+    const filtered = activeFilter === 'all'
+      ? allPosts
+      : allPosts.filter((p) => p.source === activeFilter);
 
     if (filtered.length === 0) {
       grid.innerHTML = '';
@@ -97,39 +99,62 @@
     }
   }
 
-  // ── Reddit (fetched client-side — Reddit allows browser CORS) ───────────
+  // ── Client-side fetchers (CORS-friendly APIs) ─────────────────────────────
 
-  async function fetchReddit() {
-    const headers = { 'User-Agent': 'ClaudePulse/1.0' };
-    const [r1, r2] = await Promise.all([
-      fetch('https://www.reddit.com/r/ClaudeAI/new.json?limit=25', { headers }),
-      fetch('https://www.reddit.com/search.json?q=claude+anthropic&sort=new&limit=25', { headers }),
-    ]);
-    const [d1, d2] = await Promise.all([r1.json(), r2.json()]);
-
+  async function fetchHackerNews() {
+    const queries = ['claude anthropic', 'claude AI'];
     const seenIds = new Set();
     const posts = [];
-    for (const data of [d1, d2]) {
-      for (const child of data?.data?.children ?? []) {
-        const p = child.data;
-        if (!p || seenIds.has(p.id)) continue;
-        seenIds.add(p.id);
+
+    for (const q of queries) {
+      const r = await fetch(
+        `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(q)}&sort=byDate&hitsPerPage=30`
+      );
+      const data = await r.json();
+      for (const hit of data.hits ?? []) {
+        if (!hit.title || seenIds.has(hit.objectID)) continue;
+        seenIds.add(hit.objectID);
         posts.push({
-          id: p.id,
-          title: p.title,
-          url: p.url,
-          permalink: `https://www.reddit.com${p.permalink}`,
-          upvotes: p.ups,
-          subreddit: p.subreddit_name_prefixed,
-          createdAt: p.created_utc * 1000,
-          source: 'reddit',
+          id: hit.objectID,
+          title: hit.title,
+          url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
+          permalink: `https://news.ycombinator.com/item?id=${hit.objectID}`,
+          upvotes: hit.points || 0,
+          createdAt: new Date(hit.created_at).getTime(),
+          source: 'hackernews',
         });
       }
     }
     return { posts, fetchedAt: Date.now() };
   }
 
-  // ── Fetch ─────────────────────────────────────────────────────────────────
+  async function fetchDevTo() {
+    const [r1, r2] = await Promise.all([
+      fetch('https://dev.to/api/articles?tag=claude&per_page=30&top=1'),
+      fetch('https://dev.to/api/articles?tag=anthropic&per_page=20&top=1'),
+    ]);
+    const [d1, d2] = await Promise.all([r1.json(), r2.json()]);
+
+    const seenIds = new Set();
+    const posts = [];
+
+    for (const article of [...(Array.isArray(d1) ? d1 : []), ...(Array.isArray(d2) ? d2 : [])]) {
+      if (!article.title || seenIds.has(article.id)) continue;
+      seenIds.add(article.id);
+      posts.push({
+        id: String(article.id),
+        title: article.title,
+        url: article.url,
+        permalink: article.url,
+        upvotes: article.positive_reactions_count || 0,
+        createdAt: new Date(article.published_at).getTime(),
+        source: 'devto',
+      });
+    }
+    return { posts, fetchedAt: Date.now() };
+  }
+
+  // ── Main fetch ────────────────────────────────────────────────────────────
 
   async function fetchAll() {
     refreshBtn.disabled = true;
@@ -141,17 +166,26 @@
     const errors = [];
     let latestFetchedAt = null;
 
-    const results = await Promise.allSettled([
-      fetchReddit(),
+    const [hnResult, devtoResult, phResult, redditResult] = await Promise.allSettled([
+      fetchHackerNews(),
+      fetchDevTo(),
       fetch('/api/producthunt').then((r) => r.json()),
+      fetch('/api/reddit').then((r) => r.json()),
     ]);
+
+    const labeled = [
+      { result: hnResult,     label: 'Hacker News' },
+      { result: devtoResult,  label: 'Dev.to' },
+      { result: phResult,     label: 'Product Hunt' },
+      { result: redditResult, label: 'Reddit' },
+    ];
 
     const posts = [];
 
-    results.forEach((result, i) => {
-      const label = i === 0 ? 'Reddit' : 'Product Hunt';
+    for (const { result, label } of labeled) {
       if (result.status === 'fulfilled') {
         const data = result.value;
+        if (data.disabled) continue; // silently skip disabled sources
         if (data.error) {
           errors.push(`${label}: ${data.error}`);
         } else {
@@ -161,9 +195,8 @@
       } else {
         errors.push(`${label}: network error`);
       }
-    });
+    }
 
-    // Sort newest first; posts without timestamps go to the end
     posts.sort((a, b) => {
       if (!a.createdAt && !b.createdAt) return 0;
       if (!a.createdAt) return 1;
@@ -175,7 +208,7 @@
     renderPosts();
 
     if (latestFetchedAt) {
-      lastFetchedEl.textContent = formatFetchTime(latestFetchedAt);
+      lastFetchedEl.textContent = `Last fetched: ${new Date(latestFetchedAt).toLocaleTimeString()}`;
     }
 
     if (errors.length) {
@@ -198,8 +231,6 @@
       renderPosts();
     });
   });
-
-  // ── Init ──────────────────────────────────────────────────────────────────
 
   refreshBtn.addEventListener('click', fetchAll);
   fetchAll();
