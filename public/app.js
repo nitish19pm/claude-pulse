@@ -106,18 +106,10 @@
   // ── PM + AI keyword filter ────────────────────────────────────────────────
 
   const AI_KEYWORDS = ['claude', 'anthropic', 'chatgpt', 'openai', 'gpt-4', 'gpt4', 'gemini', 'copilot', 'llm', 'ai tool', 'large language model'];
-  const PM_KEYWORDS = ['product manager', 'product management', 'product strategy', 'roadmap', 'product owner', 'prd', 'go-to-market', 'gtm', 'product lead', 'product team', 'product thinking', 'product design', ' pm ', 'pms ', 'product build', 'product dev', 'product work', 'product folk', 'product people', 'build product', 'ship product', 'saas', 'b2b', 'enterprise', 'workflow', 'productivity', 'use case', 'use cases', 'decision making', 'stakeholder', 'feature priorit', 'product launch', 'go to market'];
-
-  function isPmAiArticle(title) {
-    const t = title.toLowerCase();
-    return AI_KEYWORDS.some(k => t.includes(k)) && PM_KEYWORDS.some(k => t.includes(k));
-  }
 
   function getMatchedTags(title) {
     const t = title.toLowerCase();
-    const ai = AI_KEYWORDS.filter(k => t.includes(k));
-    const pm = PM_KEYWORDS.filter(k => t.includes(k));
-    return [...new Set([...ai, ...pm])].slice(0, 4);
+    return AI_KEYWORDS.filter(k => t.includes(k)).slice(0, 4);
   }
 
   // ── Client-side fetchers (CORS-friendly APIs) ─────────────────────────────
@@ -152,7 +144,7 @@
         });
       }
     }
-    return { posts: posts.filter(p => isPmAiArticle(p.title)), fetchedAt: Date.now() };
+    return { posts, fetchedAt: Date.now() };
   }
 
   async function fetchDevTo() {
@@ -180,7 +172,7 @@
         });
       }
     }
-    return { posts: posts.filter(p => isPmAiArticle(p.title)), fetchedAt: Date.now() };
+    return { posts, fetchedAt: Date.now() };
   }
 
   // ── Main fetch ────────────────────────────────────────────────────────────
