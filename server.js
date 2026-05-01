@@ -18,7 +18,7 @@ const RSS_FEEDS = [
 
 async function fetchRssFeed({ url, name }) {
   const resp = await axios.get(url, {
-    headers: { 'User-Agent': 'ClaudePulse/1.0' },
+    headers: { 'User-Agent': 'RadarAI/1.0' },
     timeout: 10000,
   });
   const $ = cheerio.load(resp.data, { xmlMode: true });
@@ -71,7 +71,7 @@ app.get('/api/reddit', async (req, res) => {
 // Local dev
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Claude Pulse running at http://localhost:${PORT}`);
+    console.log(`RadarAI running at http://localhost:${PORT}`);
   });
 }
 

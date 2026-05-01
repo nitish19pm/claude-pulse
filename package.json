@@ -1,7 +1,7 @@
 {
-  "name": "claude-pulse",
+  "name": "radar-ai",
   "version": "1.0.0",
-  "description": "Dashboard aggregating Claude AI posts from Reddit and Product Hunt",
+  "description": "Everything AI. Nothing you don't need.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

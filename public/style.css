@@ -141,6 +141,14 @@ header {
   to { transform: rotate(360deg); }
 }
 
+.tagline {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 2px;
+}
+
 .last-fetched {
   text-align: center;
   font-size: 0.75rem;

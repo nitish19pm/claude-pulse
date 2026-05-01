@@ -16,11 +16,11 @@
     'Topics':   ['product management', 'roadmap', 'saas', 'enterprise', 'workflow', 'productivity'],
   };
 
-  let activeChips = new Set(JSON.parse(localStorage.getItem('claude_pulse_chips') || '[]'));
-  let filterOpen  = JSON.parse(localStorage.getItem('claude_pulse_filter_open') || 'false');
+  let activeChips = new Set(JSON.parse(localStorage.getItem('radarai_chips') || '[]'));
+  let filterOpen  = JSON.parse(localStorage.getItem('radarai_filter_open') || 'false');
 
   function saveChips() {
-    localStorage.setItem('claude_pulse_chips', JSON.stringify([...activeChips]));
+    localStorage.setItem('radarai_chips', JSON.stringify([...activeChips]));
   }
 
   function updateChipUI() {
@@ -63,7 +63,7 @@
 
   document.getElementById('chip-toggle').addEventListener('click', () => {
     filterOpen = !filterOpen;
-    localStorage.setItem('claude_pulse_filter_open', JSON.stringify(filterOpen));
+    localStorage.setItem('radarai_filter_open', JSON.stringify(filterOpen));
     updateChipUI();
   });
 
